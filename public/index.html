@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width" maximum-scale=1.0, minimum-scale=1.0, initial-scale=1.0 />
+    <title>React Google Maps Component</title>
+  </head>
+
+  <body>
+    <div id="appBootElement"></div>
+    <script>
+      // For detecting uncaught errors.  Word to your motherboard.
+      //
+      window.onerror = function (errorMsg, url, lineNumber, columnNumber, errorObj) {
+        var marketviewApp = document.getElementById('appBootElement');
+        // marketviewApp.innerHTML = '<div><span>msg: </span><span>' + errorMsg + '</span></div>'
+        //                         + '<div><span>url: </span><span>' + url + '</span></div>'
+        //                         + '<div><span>lineNumber: </span><span>' + lineNumber + '</span></div>'
+        //                         + '<div><span>columnNumber: </span><span>' + columnNumber + '</span></div>'
+        //                         + '<div><span>errorObj: </span><span>' + JSON.stringify(errorObj, null, 2) + '</span></div>';
+        console.error('window.onerror ', errorMsg, url, lineNumber, columnNumber, errorObj);
+      }
+    </script>
+  <script type="text/javascript" src="./bundle.27c385fe0cf73032646d.js"></script></body>
+
+</html>
