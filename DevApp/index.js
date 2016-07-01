@@ -21,5 +21,5 @@ if (__DEV__) {
 render(
   <Root store={store} />
   ,
-  document.getElementById('appBootElement')
+  document.getElementById('gmAppBootElement')
 );

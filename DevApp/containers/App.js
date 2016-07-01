@@ -2,6 +2,9 @@
 import React, { Component }                         from 'react';
 import { connect }                                  from 'react-redux';
 
+import GoogleMapsComponent                          from '../../GoogleMapsComponent/index';
+const  GoogleMap                                    = GoogleMapsComponent.GoogleMap;
+
 
 function mapStateToProps(state) {
   return {};
@@ -17,7 +20,7 @@ class App extends Component {
   render() {
     return (
       <div className={'gmAppContainer'}>
-        <h1>Google Maps React Component</h1>
+        <GoogleMap />
       </div>
     );
   }

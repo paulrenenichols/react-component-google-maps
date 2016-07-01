@@ -20,7 +20,6 @@ module.exports = {
         loaders: [{
             test: /\.js$/,
             loaders: ['babel'],
-            include: path.join(__dirname, 'DevApp'),
             exclude: /node_modules/
         },
         {
