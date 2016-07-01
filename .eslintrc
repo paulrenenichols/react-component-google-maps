@@ -1,0 +1,33 @@
+{
+  "extends": "eslint:recommended",
+  "ecmaFeatures": {
+    "jsx": true,
+    "modules": true,
+    "es6": true
+  },
+  "globals": {
+    "__DEV__": false,
+    "__PRODUCTION__": false
+  },
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "parser": "babel-eslint",
+  "rules": {
+    "quotes": [2, "single"],
+    "strict": [2, "never"],
+    "react/jsx-uses-react": 2,
+    "react/jsx-uses-vars": 2,
+    "react/react-in-jsx-scope": 2,
+    "global-strict": 0,
+    "no-unused-vars": [2, {"vars": "all", "args": "none"}],
+    "no-unused-expressions": [2, { allowShortCircuit: true, allowTernary: true }],
+    "semi": [2, "always"],
+    "no-console": [1],
+    "no-constant-condition": [1]
+  },
+  "plugins": [
+    "react"
+  ]
+}
