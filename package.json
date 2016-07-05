@@ -56,6 +56,8 @@
     "immutable": "^3.8.1",
     "json-loader": "^0.5.4",
     "less-loader": "^2.2.3",
+    "lodash": "^4.13.1",
+    "pubsub-js": "^1.5.3",
     "react": "^15.2.0",
     "react-addons-perf": "^15.2.0",
     "react-dom": "^15.2.0",

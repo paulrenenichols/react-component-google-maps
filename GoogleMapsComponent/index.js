@@ -1,8 +1,10 @@
-import { GoogleMap } from './GoogleMap';
-export { GoogleMap } from './GoogleMap';
+import { GoogleMap }  from './GoogleMap';
+export { GoogleMap }  from './GoogleMap';
 
-const expDefault = {
-  GoogleMap
+import { Marker }     from './Marker';
+export { Marker }     from './Marker';
+
+export default {
+  GoogleMap,
+  Marker
 };
-
-export default expDefault;
