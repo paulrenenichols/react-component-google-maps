@@ -14,6 +14,7 @@ window.DevSandBox.Perf                  = Perf;
 export default class Root extends Component {
   constructor(props) {
     super(props);
+    window.DevSandBox.store = this.props.store;
   }
 
   render() {
