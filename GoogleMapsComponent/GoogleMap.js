@@ -23,7 +23,8 @@ export class GoogleMap extends Component {
     ])),
     subscribePanTo:   PropTypes.func,
     unsubscribePanTo: PropTypes.func,
-    zoom:             PropTypes.number
+    zoom:             PropTypes.number,
+    trafficLayer:     PropTypes.bool
   };
 
   static defaultProps = {
@@ -42,14 +43,13 @@ export class GoogleMap extends Component {
     },
     markers:  [],
     subscribePanTo: () => {},
-    unsubscribePanTo: () => {}
+    unsubscribePanTo: () => {},
+    trafficLayer: true
   };
 
-  state = {
-    googleMap: null
-  };
-
-  _mapMarkers = {};
+  _map          = null;
+  _trafficLayer = null;
+  _mapMarkers   = {};
 
   constructor(props) {
     super(props);
@@ -61,7 +61,6 @@ export class GoogleMap extends Component {
     if (center) {
       mapOptions.center = center;
     }
-
     if (zoom) {
       mapOptions.zoom = zoom;
     }
@@ -82,28 +81,40 @@ export class GoogleMap extends Component {
     }, {});
   }
 
+  processTrafficLayer(enableTrafficLayer) {
+    if (enableTrafficLayer) {
+      this._trafficLayer = new google.maps.TrafficLayer({
+        map: this._map
+      });
+    }
+    else if (this._trafficLayer) {
+      this._trafficLayer.setMap(null);
+      this._trafficLayer = null;
+    }
+  }
+
   panTo = (msg, latLng) => {
-    this.state.googleMap.panTo(latLng);
+    this._map.panTo(latLng);
   }
 
   componentDidMount() {
     const { markers }  = this.props;
 
-    const gmap = new google.maps.Map(ReactDOM.findDOMNode(this), this.mapOptions());
+    this._map = new google.maps.Map(ReactDOM.findDOMNode(this), this.mapOptions());
 
-    this.setState({
-      googleMap: gmap
-    });
+    this.processTrafficLayer(this.props.trafficLayer);
 
-    this.processMarkers(markers, gmap);
+    this.processMarkers(markers, this._map);
 
     this.props.subscribePanTo(this.panTo);
   }
 
   componentWillReceiveProps(nextProps) {
-    this.processMarkers(nextProps.markers, this.state.googleMap);
+    this.processMarkers(nextProps.markers, this._map);
 
-    this.state.googleMap.setOptions(this.mapOptions());
+    this._map.setOptions(this.mapOptions());
+
+    this.processTrafficLayer((this.props.trafficLayer !== nextProps.trafficLayer) && nextProps.trafficLayer);
   }
 
   componentWillUnmount() {
