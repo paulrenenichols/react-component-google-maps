@@ -2,13 +2,22 @@ import { fromJS }  from 'immutable';
 
 const initialState = fromJS({
   center: {
-    lat:    30.3074625,
-    lng:    -98.0335911
+    lat:    30.2746652,
+    lng:    -97.7403505
   },
   markers:  [
     {
-      label:  'E',
+      label:  'D',
       id:     '0001',
+      position: {
+        lat:  30.2644987,
+        lng:  -97.7821164
+      },
+      title:  'Dropoff'
+    },
+    {
+      label:  'E',
+      id:     '0002',
       position: {
         lat:  30.2659184,
         lng:  -97.7356529
@@ -17,7 +26,7 @@ const initialState = fromJS({
     },
     {
       label:  'P',
-      id:     '0002',
+      id:     '0003',
       position: {
         lat:  30.2499844,
         lng:  -97.7522357
@@ -25,7 +34,7 @@ const initialState = fromJS({
       title:  'Perla\'s'
     }
   ],
-  zoom:     10
+  zoom:     14
 });
 
 export default function config(state = initialState, action = {}) {
