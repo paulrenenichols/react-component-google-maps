@@ -11,20 +11,20 @@ import Marker                 from './Marker';
 
 export class GoogleMap extends Component {
   static propTypes = {
-    center:           PropTypes.shape({
+    center:               PropTypes.shape({
       lat: PropTypes.number,
       lng: PropTypes.number
     }),
-    containerStyle:   PropTypes.object,
-    mapOptions:       PropTypes.object,
-    markers:          PropTypes.arrayOf(PropTypes.oneOfType([
+    containerStyle:       PropTypes.object,
+    mapOptions:           PropTypes.object,
+    markers:              PropTypes.arrayOf(PropTypes.oneOfType([
       PropTypes.object,
       PropTypes.instanceOf(Marker)
     ])),
-    subscribePanTo:   PropTypes.func,
-    unsubscribePanTo: PropTypes.func,
-    zoom:             PropTypes.number,
-    trafficLayer:     PropTypes.bool
+    subscribePanTo:       PropTypes.func,
+    unsubscribePanTo:     PropTypes.func,
+    zoom:                 PropTypes.number,
+    showTrafficLayer:     PropTypes.bool
   };
 
   static defaultProps = {
@@ -44,7 +44,7 @@ export class GoogleMap extends Component {
     markers:  [],
     subscribePanTo: () => {},
     unsubscribePanTo: () => {},
-    trafficLayer: true
+    showTrafficLayer: true
   };
 
   _map          = null;
@@ -102,7 +102,7 @@ export class GoogleMap extends Component {
 
     this._map = new google.maps.Map(ReactDOM.findDOMNode(this), this.mapOptions());
 
-    this.processTrafficLayer(this.props.trafficLayer);
+    this.processTrafficLayer(this.props.showTrafficLayer);
 
     this.processMarkers(markers, this._map);
 
@@ -114,7 +114,7 @@ export class GoogleMap extends Component {
 
     this._map.setOptions(this.mapOptions());
 
-    this.processTrafficLayer((this.props.trafficLayer !== nextProps.trafficLayer) && nextProps.trafficLayer);
+    this.processTrafficLayer((this.props.showTrafficLayer !== nextProps.showTrafficLayer) && nextProps.showTrafficLayer);
   }
 
   componentWillUnmount() {
