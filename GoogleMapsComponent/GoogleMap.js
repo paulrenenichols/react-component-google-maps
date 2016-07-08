@@ -16,7 +16,20 @@ export class GoogleMap extends Component {
       lng: PropTypes.number
     }),
     containerStyle:       PropTypes.object,
-    directionMarkers:     PropTypes.object,
+    directionMarkers:     PropTypes.shape({
+      origin:       PropTypes.oneOfType([
+        PropTypes.object,
+        PropTypes.instanceOf(Marker)
+      ]),
+      destination:  PropTypes.oneOfType([
+        PropTypes.object,
+        PropTypes.instanceOf(Marker)
+      ]),
+      waypoints:    PropTypes.arrayOf(PropTypes.oneOfType([
+        PropTypes.object,
+        PropTypes.instanceOf(Marker)
+      ]))
+    }),
     mapOptions:           PropTypes.object,
     markers:              PropTypes.arrayOf(PropTypes.oneOfType([
       PropTypes.object,
