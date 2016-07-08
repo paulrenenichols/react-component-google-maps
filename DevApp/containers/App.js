@@ -8,15 +8,19 @@ const  GoogleMap                                    = GoogleMapsComponent.Google
 import { MarkerList }                               from '../components/MarkerList';
 
 import selectors                                    from '../selectors/index';
-const  { center, markers, zoom }                    = selectors.map;
+const  { center,
+         markers,
+         zoom,
+         directionsMarkers }                        = selectors.map;
 
 import events                                       from '../events/index';
 
 function mapStateToProps(state) {
   return {
-    center:   center(state),
-    markers:  markers(state),
-    zoom:     zoom(state),
+    center:             center(state),
+    markers:            markers(state),
+    zoom:               zoom(state),
+    directionsMarkers:  directionsMarkers(state)
   };
 }
 

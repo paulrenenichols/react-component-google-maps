@@ -16,6 +16,7 @@ export class GoogleMap extends Component {
       lng: PropTypes.number
     }),
     containerStyle:       PropTypes.object,
+    directionMarkers:     PropTypes.object,
     mapOptions:           PropTypes.object,
     markers:              PropTypes.arrayOf(PropTypes.oneOfType([
       PropTypes.object,
@@ -24,6 +25,7 @@ export class GoogleMap extends Component {
     subscribePanTo:       PropTypes.func,
     unsubscribePanTo:     PropTypes.func,
     zoom:                 PropTypes.number,
+    showDirections:       PropTypes.bool,
     showTrafficLayer:     PropTypes.bool
   };
 
@@ -31,6 +33,11 @@ export class GoogleMap extends Component {
     containerStyle: {
       width:  '100%',
       height: '100%'
+    },
+    directionsMarkers: {
+      origin: null,
+      destination: null,
+      waypoints: []
     },
     mapOptions: {
       center: {
@@ -44,12 +51,15 @@ export class GoogleMap extends Component {
     markers:  [],
     subscribePanTo: () => {},
     unsubscribePanTo: () => {},
+    showDirections:   true,
     showTrafficLayer: true
   };
 
-  _map          = null;
-  _trafficLayer = null;
-  _mapMarkers   = {};
+  _directionsService  = null;
+  _directionsDisplay  = null;
+  _map                = null;
+  _trafficLayer       = null;
+  _mapMarkers         = {};
 
   constructor(props) {
     super(props);
@@ -81,6 +91,16 @@ export class GoogleMap extends Component {
     }, {});
   }
 
+  clearMarkers() {
+    const markerKeys = Object.keys(this._mapMarkers);
+    const mapMarkers = this._mapMarkers;
+    markerKeys.forEach(function (markerKey) {
+      mapMarkers[markerKey].setMap(null);
+      delete mapMarkers[markerKey];
+    });
+    this._mapMarkers = null;
+  }
+
   processTrafficLayer(enableTrafficLayer) {
     if (enableTrafficLayer) {
       this._trafficLayer = new google.maps.TrafficLayer({
@@ -93,18 +113,46 @@ export class GoogleMap extends Component {
     }
   }
 
+  processDirections(enableDirections) {
+    const { origin, destination, waypoints } = this.props.directionsMarkers;
+    if (enableDirections) {
+      this.clearMarkers();
+      this._directionsService = new google.maps.DirectionsService();
+      const directionsDisplay = this._directionsDisplay = new google.maps.DirectionsRenderer();
+      directionsDisplay.setMap(this._map);
+      this._directionsService.route({
+          origin: origin.position,
+          destination: destination.position,
+          waypoints: waypoints.map(waypoint => {
+            return {location: waypoint.position, stopover: true};
+          }),
+          optimizeWaypoints: true,
+          travelMode: google.maps.TravelMode.DRIVING,
+          provideRouteAlternatives: true
+        },
+        function (result, status) {
+          if (status == google.maps.DirectionsStatus.OK) {
+            directionsDisplay.setDirections(result);
+          }
+        }
+      );
+    }
+  }
+
   panTo = (msg, latLng) => {
     this._map.panTo(latLng);
   }
 
   componentDidMount() {
-    const { markers }  = this.props;
+    const { markers, showDirections }  = this.props;
 
     this._map = new google.maps.Map(ReactDOM.findDOMNode(this), this.mapOptions());
 
     this.processTrafficLayer(this.props.showTrafficLayer);
 
     this.processMarkers(markers, this._map);
+
+    this.processDirections(showDirections);
 
     this.props.subscribePanTo(this.panTo);
   }
