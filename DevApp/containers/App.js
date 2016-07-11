@@ -12,7 +12,8 @@ const  { center,
          markers,
          zoom,
          directionsMarkers,
-         showDirections }                           = selectors.map;
+         showDirections,
+         showTraffic }                              = selectors.map;
 
 import events                                       from '../events/index';
 
@@ -25,7 +26,8 @@ function mapStateToProps(state) {
     markers:            markers(state),
     zoom:               zoom(state),
     directionsMarkers:  directionsMarkers(state),
-    showDirections:     showDirections(state)
+    showDirections:     showDirections(state),
+    showTraffic:        showTraffic(state)
   };
 }
 
@@ -42,6 +44,9 @@ function mapDispatchToProps(dispatch) {
     },
     setDirectionsDisplayState(displayState) {
       dispatch(Creators.mapSetDirectionsDisplayState(displayState));
+    },
+    setTrafficDisplayState(displayState) {
+      dispatch(Creators.mapSetTrafficDisplayState(displayState));
     }
   };
 }

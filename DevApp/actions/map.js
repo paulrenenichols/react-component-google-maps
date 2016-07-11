@@ -5,3 +5,11 @@ export function mapSetDirectionsDisplayState(displayState) {
     displayState
   };
 }
+
+export const MAP_SET_TRAFFIC_DISPLAY_STATE = Symbol('MAP_SET_TRAFFIC_DISPLAY_STATE');
+export function mapSetTrafficDisplayState(displayState) {
+  return {
+    type: MAP_SET_TRAFFIC_DISPLAY_STATE,
+    displayState
+  };
+}

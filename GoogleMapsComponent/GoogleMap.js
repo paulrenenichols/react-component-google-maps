@@ -37,7 +37,7 @@ export class GoogleMap extends Component {
     unsubscribePanTo:     PropTypes.func,
     zoom:                 PropTypes.number,
     showDirections:       PropTypes.bool,
-    showTrafficLayer:     PropTypes.bool
+    showTraffic:          PropTypes.bool
   };
 
   static defaultProps = {
@@ -62,8 +62,8 @@ export class GoogleMap extends Component {
     markers:  [],
     subscribePanTo: () => {},
     unsubscribePanTo: () => {},
-    showDirections:   true,
-    showTrafficLayer: true
+    showDirections:   false,
+    showTraffic: false
   };
 
   _directionsService  = null;
@@ -169,12 +169,12 @@ export class GoogleMap extends Component {
   }
 
   initializeMap() {
-    const { showDirections, showTrafficLayer } = this.props;
+    const { showDirections, showTraffic } = this.props;
     // create a new google map
     this._map = new google.maps.Map(ReactDOM.findDOMNode(this), this.mapOptions());
 
     // show traffic layer if props say so
-    if (showTrafficLayer) {
+    if (showTraffic) {
       this.enableTrafficLayer();
     }
 
@@ -189,11 +189,11 @@ export class GoogleMap extends Component {
   }
 
   updateMap(nextProps) {
-    const { showDirections, showTrafficLayer } = nextProps;
+    const { showDirections, showTraffic } = nextProps;
 
     this._map.setOptions(this.mapOptions());
 
-    if (showTrafficLayer) {
+    if (showTraffic) {
       this.enableTrafficLayer();
     }
     else {

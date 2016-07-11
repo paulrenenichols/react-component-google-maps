@@ -13,14 +13,16 @@ export class MapControls extends Component {
     ])),
     panMap:                       PropTypes.func,
     showDirections:               PropTypes.bool,
-    setDirectionsDisplayState:    () => {}
+    setDirectionsDisplayState:    PropTypes.func,
+    setTrafficDisplayState:       PropTypes.func
   };
 
   static defaultProps = {
     markers:                      [],
     panMap:                       () => {},
     showDirections:               false,
-    setDirectionsDisplayState:    () => {}
+    setDirectionsDisplayState:    () => {},
+    setTrafficDisplayState:       () => {}
   };
 
   constructor(props) {
@@ -28,7 +30,12 @@ export class MapControls extends Component {
   }
 
   render() {
-    const { markers, panMap, showDirections, setDirectionsDisplayState } = this.props;
+    const { markers,
+            panMap,
+            showDirections,
+            showTraffic,
+            setDirectionsDisplayState,
+            setTrafficDisplayState } = this.props;
 
     return (
       <div className={'mapControlsContainer'}>
@@ -37,6 +44,10 @@ export class MapControls extends Component {
             <div className={'checkboxControl'}>
               <input type="checkbox" id="directions" checked={showDirections} onChange={event => setDirectionsDisplayState(event.target.checked)}/>
               <label htmlFor="directions">Show Directions</label>
+            </div>
+            <div className={'checkboxControl'}>
+              <input type="checkbox" id="traffic" checked={showTraffic} onChange={event => setTrafficDisplayState(event.target.checked)}/>
+              <label htmlFor="traffic">Show Traffic</label>
             </div>
           </div>
           <div className={'markerList'}>
