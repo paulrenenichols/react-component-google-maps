@@ -5,7 +5,7 @@ import { connect }                                  from 'react-redux';
 import GoogleMapsComponent                          from '../../GoogleMapsComponent/index';
 const  GoogleMap                                    = GoogleMapsComponent.GoogleMap;
 
-import { MarkerList }                               from '../components/MarkerList';
+import { MapControls }                              from '../components/MapControls';
 
 import selectors                                    from '../selectors/index';
 const  { center,
@@ -43,7 +43,7 @@ class App extends Component {
   render() {
     return (
       <div className={'gmAppContainer'}>
-        <MarkerList {...this.props} />
+        <MapControls {...this.props} />
         <GoogleMap {...this.props} />
       </div>
     );

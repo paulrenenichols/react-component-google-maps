@@ -6,7 +6,7 @@ import ReactDOM               from 'react-dom';
 import GoogleMapsComponent    from '../../GoogleMapsComponent/index';
 const  { Marker }             = GoogleMapsComponent;
 
-export class MarkerList extends Component {
+export class MapControls extends Component {
   static propTypes = {
     markers:  PropTypes.arrayOf(PropTypes.oneOfType([
       PropTypes.object,
