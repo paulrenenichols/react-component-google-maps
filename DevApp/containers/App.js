@@ -11,16 +11,21 @@ import selectors                                    from '../selectors/index';
 const  { center,
          markers,
          zoom,
-         directionsMarkers }                        = selectors.map;
+         directionsMarkers,
+         showDirections }                           = selectors.map;
 
 import events                                       from '../events/index';
+
+import Actions                                      from '../actions/index';
+const  Creators                                     = Actions.Map.Creators;
 
 function mapStateToProps(state) {
   return {
     center:             center(state),
     markers:            markers(state),
     zoom:               zoom(state),
-    directionsMarkers:  directionsMarkers(state)
+    directionsMarkers:  directionsMarkers(state),
+    showDirections:     showDirections(state)
   };
 }
 
@@ -34,6 +39,9 @@ function mapDispatchToProps(dispatch) {
     },
     panMap(latLng) {
       events.maps.Publish.panMainMap(latLng);
+    },
+    setDirectionsDisplayState(displayState) {
+      dispatch(Creators.mapSetDirectionsDisplayState(displayState));
     }
   };
 }

@@ -4,8 +4,6 @@ import React, { Component,
 import ReactDOM               from 'react-dom';
 import google                 from 'google';
 
-import _                      from 'lodash/core';
-
 import Marker                 from './Marker';
 
 
@@ -191,9 +189,25 @@ export class GoogleMap extends Component {
   }
 
   updateMap(nextProps) {
-    const { showDirections, showTrafficLayer } = this.props;
+    const { showDirections, showTrafficLayer } = nextProps;
 
-    if (showTrafficLayer) {}
+    this._map.setOptions(this.mapOptions());
+
+    if (showTrafficLayer) {
+      this.enableTrafficLayer();
+    }
+    else {
+      this.disableTrafficLayer();
+    }
+
+    if (showDirections) {
+      this.disableMarkers();
+      this.enableDirections();
+    }
+    else {
+      this.disableDirections();
+      this.enableMarkers();
+    }
   }
 
   panTo = (msg, latLng) => {
@@ -205,11 +219,7 @@ export class GoogleMap extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.processMarkers(nextProps.markers, this._map);
-
-    this._map.setOptions(this.mapOptions());
-
-    this.processTrafficLayer((this.props.showTrafficLayer !== nextProps.showTrafficLayer) && nextProps.showTrafficLayer);
+    this.updateMap(nextProps);
   }
 
   componentWillUnmount() {

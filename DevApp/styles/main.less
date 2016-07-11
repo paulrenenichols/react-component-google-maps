@@ -5,24 +5,53 @@ html, body, #gmAppBootElement, .gmRoot, .gmAppContainer {
   padding: 0;
 }
 
-.markerList {
+button {
+  border: 1px solid black;
+  border-radius: 5px;
+  outline: none;
+  display: block;
+}
+
+h3 {
+  margin: 2px 0;
+}
+
+.mapControlsContainer {
   position: absolute;
   top: 10px;
   left: 10px;
   z-index: 2;
   width: 200px;
+  background: rgba(100, 100, 100, 0.5);
+}
+
+.mapControlsContents {
+  width: 80%;
+  margin: 10px auto;
+}
+
+.markerList {
+
+  margin-top: 10px;
+
+  background: #ddd;
+  padding: 5px;
 
   button {
-    display: block;
     width: 100%;
-    font-size: 24px;
+    font-size: 20px;
     cursor: pointer;
     background: white;
-    outline: none;
+    margin: 2px auto;
 
     &:hover {
       background: black;
       color: white;
     }
   }
+}
+
+.mapLayerControls {
+  background: #ddd;
+  padding: 5px;
 }

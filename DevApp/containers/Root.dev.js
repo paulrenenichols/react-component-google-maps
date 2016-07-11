@@ -3,6 +3,7 @@ import { Provider }                     from 'react-redux';
 
 import App                              from './App';
 import Selectors                        from '../selectors/index';
+import Actions                          from '../actions/index';
 
 // Debugging imports for development test in browser console
 import Immutable                        from 'immutable';
@@ -12,8 +13,7 @@ window.DevSandBox                       = {};
 window.DevSandBox.Immutable             = Immutable;
 window.DevSandBox.Perf                  = Perf;
 window.DevSandBox.Selectors             = Selectors;
-
-
+window.DevSandBox.Actions               = Actions;
 
 export default class Root extends Component {
   constructor(props) {
