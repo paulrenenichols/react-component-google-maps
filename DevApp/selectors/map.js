@@ -12,6 +12,8 @@ export const markers            = createImmutableSelector(
   map => map.get('markers').toJS()
 );
 
+export const showDirections     = state => map(state).get('showDirections');
+
 export const zoom               = createImmutableSelector(
   map,
   map => map.get('zoom')
@@ -33,5 +35,6 @@ export default {
   center,
   directionsMarkers,
   markers,
-  zoom
+  zoom,
+  showDirections
 };

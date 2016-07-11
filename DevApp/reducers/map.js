@@ -1,4 +1,7 @@
-import { fromJS }  from 'immutable';
+import { fromJS }   from 'immutable';
+
+import Actions      from '../actions/index';
+const  Types        = Actions.Map.Types;
 
 const initialState = fromJS({
   center: {
@@ -34,11 +37,15 @@ const initialState = fromJS({
       title:  'Perla\'s'
     }
   ],
+  showDirections: false,
   zoom:     14
 });
 
 export default function config(state = initialState, action = {}) {
   switch (action.type) {
+    case Types.MAP_SET_DIRECTIONS_DISPLAY_STATE:
+      return state.set('showDirections', action.displayState);
+
     default:
       return state;
   }
