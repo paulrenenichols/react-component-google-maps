@@ -91,8 +91,9 @@ export class GoogleMap extends Component {
     return mapOptions;
   }
 
-  processMarkers(markers, map) {
-    this._mapMarkers = markers.reduce(function (reduction, marker) {
+  renderMarkers() {
+    const map = this._map;
+    this._mapMarkers = this.props.markers.reduce(function (reduction, marker) {
       reduction[marker.id] = new google.maps.Marker({
         label:    marker.label,
         map:      map,
@@ -104,52 +105,95 @@ export class GoogleMap extends Component {
     }, {});
   }
 
-  clearMarkers() {
-    const markerKeys = Object.keys(this._mapMarkers);
-    const mapMarkers = this._mapMarkers;
-    markerKeys.forEach(function (markerKey) {
-      mapMarkers[markerKey].setMap(null);
-      delete mapMarkers[markerKey];
-    });
-    this._mapMarkers = null;
+  enableMarkers() {
+    this.renderMarkers();
   }
 
-  processTrafficLayer(enableTrafficLayer) {
-    if (enableTrafficLayer) {
-      this._trafficLayer = new google.maps.TrafficLayer({
-        map: this._map
+  disableMarkers() {
+    if (this._mapMarkers) {
+      const markerKeys = Object.keys(this._mapMarkers);
+      const mapMarkers = this._mapMarkers;
+      markerKeys.forEach(function (markerKey) {
+        mapMarkers[markerKey].setMap(null);
+        delete mapMarkers[markerKey];
       });
+      this._mapMarkers = null;
     }
-    else if (this._trafficLayer) {
+  }
+
+  enableTrafficLayer() {
+    this._trafficLayer = new google.maps.TrafficLayer({
+      map: this._map
+    });
+  }
+
+  disableTrafficLayer() {
+    if (this._trafficLayer && this._trafficLayer.setMap) {
       this._trafficLayer.setMap(null);
       this._trafficLayer = null;
     }
   }
 
-  processDirections(enableDirections) {
+  renderDirections() {
     const { origin, destination, waypoints } = this.props.directionsMarkers;
-    if (enableDirections) {
-      this.clearMarkers();
-      this._directionsService = new google.maps.DirectionsService();
-      const directionsDisplay = this._directionsDisplay = new google.maps.DirectionsRenderer();
-      directionsDisplay.setMap(this._map);
-      this._directionsService.route({
-          origin: origin.position,
-          destination: destination.position,
-          waypoints: waypoints.map(waypoint => {
-            return {location: waypoint.position, stopover: true};
-          }),
-          optimizeWaypoints: true,
-          travelMode: google.maps.TravelMode.DRIVING,
-          provideRouteAlternatives: true
-        },
-        function (result, status) {
-          if (status == google.maps.DirectionsStatus.OK) {
-            directionsDisplay.setDirections(result);
-          }
+    const directionsDisplay = this._directionsDisplay;
+    this._directionsService.route({
+        origin: origin.position,
+        destination: destination.position,
+        waypoints: waypoints.map(waypoint => {
+          return {location: waypoint.position, stopover: true};
+        }),
+        optimizeWaypoints: true,
+        travelMode: google.maps.TravelMode.DRIVING,
+        provideRouteAlternatives: true
+      },
+      function (result, status) {
+        if (status == google.maps.DirectionsStatus.OK) {
+          directionsDisplay.setDirections(result);
         }
-      );
+      }
+    );
+  }
+
+  enableDirections() {
+    this._directionsService = new google.maps.DirectionsService();
+    this._directionsDisplay = new google.maps.DirectionsRenderer();
+    this._directionsDisplay.setMap(this._map);
+    this.renderDirections();
+  }
+
+  disableDirections() {
+    if (this._directionsDisplay) {
+      this._directionsDisplay.setMap(null);
+      this._directionsDisplay = null;
+      this._directionsService = null;
     }
+  }
+
+  initializeMap() {
+    const { showDirections, showTrafficLayer } = this.props;
+    // create a new google map
+    this._map = new google.maps.Map(ReactDOM.findDOMNode(this), this.mapOptions());
+
+    // show traffic layer if props say so
+    if (showTrafficLayer) {
+      this.enableTrafficLayer();
+    }
+
+    if (showDirections) {
+      this.enableDirections();
+    }
+    else {
+      this.enableMarkers();
+    }
+
+    this.props.subscribePanTo(this.panTo);
+  }
+
+  updateMap(nextProps) {
+    const { showDirections, showTrafficLayer } = this.props;
+
+    if (showTrafficLayer) {}
   }
 
   panTo = (msg, latLng) => {
@@ -157,17 +201,7 @@ export class GoogleMap extends Component {
   }
 
   componentDidMount() {
-    const { markers, showDirections }  = this.props;
-
-    this._map = new google.maps.Map(ReactDOM.findDOMNode(this), this.mapOptions());
-
-    this.processTrafficLayer(this.props.showTrafficLayer);
-
-    this.processMarkers(markers, this._map);
-
-    this.processDirections(showDirections);
-
-    this.props.subscribePanTo(this.panTo);
+    this.initializeMap();
   }
 
   componentWillReceiveProps(nextProps) {
