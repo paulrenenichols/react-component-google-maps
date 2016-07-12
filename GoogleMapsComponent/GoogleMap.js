@@ -4,33 +4,51 @@ import React, { Component,
 import ReactDOM               from 'react-dom';
 import google                 from 'google';
 
-import _                      from 'lodash/core';
-
 import Marker                 from './Marker';
 
 
 export class GoogleMap extends Component {
   static propTypes = {
-    center:           PropTypes.shape({
+    center:               PropTypes.shape({
       lat: PropTypes.number,
       lng: PropTypes.number
     }),
-    containerStyle:   PropTypes.object,
-    mapOptions:       PropTypes.object,
-    markers:          PropTypes.arrayOf(PropTypes.oneOfType([
+    containerStyle:       PropTypes.object,
+    directionMarkers:     PropTypes.shape({
+      origin:       PropTypes.oneOfType([
+        PropTypes.object,
+        PropTypes.instanceOf(Marker)
+      ]),
+      destination:  PropTypes.oneOfType([
+        PropTypes.object,
+        PropTypes.instanceOf(Marker)
+      ]),
+      waypoints:    PropTypes.arrayOf(PropTypes.oneOfType([
+        PropTypes.object,
+        PropTypes.instanceOf(Marker)
+      ]))
+    }),
+    mapOptions:           PropTypes.object,
+    markers:              PropTypes.arrayOf(PropTypes.oneOfType([
       PropTypes.object,
       PropTypes.instanceOf(Marker)
     ])),
-    subscribePanTo:   PropTypes.func,
-    unsubscribePanTo: PropTypes.func,
-    zoom:             PropTypes.number,
-    trafficLayer:     PropTypes.bool
+    subscribePanTo:       PropTypes.func,
+    unsubscribePanTo:     PropTypes.func,
+    zoom:                 PropTypes.number,
+    showDirections:       PropTypes.bool,
+    showTraffic:          PropTypes.bool
   };
 
   static defaultProps = {
     containerStyle: {
       width:  '100%',
       height: '100%'
+    },
+    directionsMarkers: {
+      origin: null,
+      destination: null,
+      waypoints: []
     },
     mapOptions: {
       center: {
@@ -44,15 +62,26 @@ export class GoogleMap extends Component {
     markers:  [],
     subscribePanTo: () => {},
     unsubscribePanTo: () => {},
-    trafficLayer: true
+    showDirections:   false,
+    showTraffic: false
   };
 
-  _map          = null;
-  _trafficLayer = null;
-  _mapMarkers   = {};
+  _directionsService  = null;
+  _directionsDisplay  = null;
+  _map                = null;
+  _trafficLayer       = null;
+  _mapMarkers         = {};
 
   constructor(props) {
     super(props);
+
+    if (!google || !google.maps) {
+      throw 'Can\'t find Google Maps API';
+    }
+
+    this._directionsService = new google.maps.DirectionsService();
+    this._directionsDisplay = new google.maps.DirectionsRenderer();
+    this._trafficLayer = new google.maps.TrafficLayer();
   }
 
   mapOptions() {
@@ -68,8 +97,9 @@ export class GoogleMap extends Component {
     return mapOptions;
   }
 
-  processMarkers(markers, map) {
-    this._mapMarkers = markers.reduce(function (reduction, marker) {
+  showMarkers() {
+    const map = this._map;
+    this._mapMarkers = this.props.markers.reduce(function (reduction, marker) {
       reduction[marker.id] = new google.maps.Marker({
         label:    marker.label,
         map:      map,
@@ -81,15 +111,91 @@ export class GoogleMap extends Component {
     }, {});
   }
 
-  processTrafficLayer(enableTrafficLayer) {
-    if (enableTrafficLayer) {
-      this._trafficLayer = new google.maps.TrafficLayer({
-        map: this._map
+  hideMarkers() {
+    if (this._mapMarkers) {
+      const markerKeys = Object.keys(this._mapMarkers);
+      const mapMarkers = this._mapMarkers;
+      markerKeys.forEach(function (markerKey) {
+        mapMarkers[markerKey].setMap(null);
+        delete mapMarkers[markerKey];
       });
+      this._mapMarkers = null;
     }
-    else if (this._trafficLayer) {
-      this._trafficLayer.setMap(null);
-      this._trafficLayer = null;
+  }
+
+  showTraffic() {
+    this._trafficLayer.setMap(this._map);
+  }
+
+  hideTraffic() {
+    this._trafficLayer.setMap(null);
+  }
+
+  showDirections() {
+    const { origin, destination, waypoints } = this.props.directionsMarkers;
+    const directionsDisplay = this._directionsDisplay;
+    this._directionsDisplay.setMap(this._map);
+    this._directionsService.route({
+        origin: origin.position,
+        destination: destination.position,
+        waypoints: waypoints.map(waypoint => {
+          return {location: waypoint.position, stopover: true};
+        }),
+        optimizeWaypoints: true,
+        travelMode: google.maps.TravelMode.DRIVING,
+        provideRouteAlternatives: true
+      },
+      function (result, status) {
+        if (status == google.maps.DirectionsStatus.OK) {
+          directionsDisplay.setDirections(result);
+        }
+      }
+    );
+  }
+
+  hideDirections() {
+    this._directionsDisplay.setMap(null);
+  }
+
+  initializeMap() {
+    const { showDirections, showTraffic } = this.props;
+    // create a new google map
+    this._map = new google.maps.Map(ReactDOM.findDOMNode(this), this.mapOptions());
+
+    // show traffic layer if props say so
+    if (showTraffic) {
+      this.showTraffic();
+    }
+
+    if (showDirections) {
+      this.showDirections();
+    }
+    else {
+      this.showMarkers();
+    }
+
+    this.props.subscribePanTo(this.panTo);
+  }
+
+  updateMap() {
+    const { showDirections, showTraffic } = this.props;
+
+    this._map.setOptions(this.mapOptions());
+
+    if (showTraffic) {
+      this.showTraffic();
+    }
+    else {
+      this.hideTraffic();
+    }
+
+    if (showDirections) {
+      this.hideMarkers();
+      this.showDirections();
+    }
+    else {
+      this.hideDirections();
+      this.showMarkers();
     }
   }
 
@@ -98,23 +204,11 @@ export class GoogleMap extends Component {
   }
 
   componentDidMount() {
-    const { markers }  = this.props;
-
-    this._map = new google.maps.Map(ReactDOM.findDOMNode(this), this.mapOptions());
-
-    this.processTrafficLayer(this.props.trafficLayer);
-
-    this.processMarkers(markers, this._map);
-
-    this.props.subscribePanTo(this.panTo);
+    this.initializeMap();
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.processMarkers(nextProps.markers, this._map);
-
-    this._map.setOptions(this.mapOptions());
-
-    this.processTrafficLayer((this.props.trafficLayer !== nextProps.trafficLayer) && nextProps.trafficLayer);
+  componentDidUpdate(prevProps, prevState) {
+    this.updateMap();
   }
 
   componentWillUnmount() {
