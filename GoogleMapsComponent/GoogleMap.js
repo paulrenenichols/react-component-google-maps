@@ -74,6 +74,14 @@ export class GoogleMap extends Component {
 
   constructor(props) {
     super(props);
+
+    if (!google || !google.maps) {
+      throw 'Can\'t find Google Maps API';
+    }
+
+    this._directionsService = new google.maps.DirectionsService();
+    this._directionsDisplay = new google.maps.DirectionsRenderer();
+    this._trafficLayer = new google.maps.TrafficLayer();
   }
 
   mapOptions() {
@@ -89,7 +97,7 @@ export class GoogleMap extends Component {
     return mapOptions;
   }
 
-  renderMarkers() {
+  showMarkers() {
     const map = this._map;
     this._mapMarkers = this.props.markers.reduce(function (reduction, marker) {
       reduction[marker.id] = new google.maps.Marker({
@@ -103,11 +111,7 @@ export class GoogleMap extends Component {
     }, {});
   }
 
-  enableMarkers() {
-    this.renderMarkers();
-  }
-
-  disableMarkers() {
+  hideMarkers() {
     if (this._mapMarkers) {
       const markerKeys = Object.keys(this._mapMarkers);
       const mapMarkers = this._mapMarkers;
@@ -119,22 +123,18 @@ export class GoogleMap extends Component {
     }
   }
 
-  enableTrafficLayer() {
-    this._trafficLayer = new google.maps.TrafficLayer({
-      map: this._map
-    });
+  showTraffic() {
+    this._trafficLayer.setMap(this._map);
   }
 
-  disableTrafficLayer() {
-    if (this._trafficLayer && this._trafficLayer.setMap) {
-      this._trafficLayer.setMap(null);
-      this._trafficLayer = null;
-    }
+  hideTraffic() {
+    this._trafficLayer.setMap(null);
   }
 
-  renderDirections() {
+  showDirections() {
     const { origin, destination, waypoints } = this.props.directionsMarkers;
     const directionsDisplay = this._directionsDisplay;
+    this._directionsDisplay.setMap(this._map);
     this._directionsService.route({
         origin: origin.position,
         destination: destination.position,
@@ -153,19 +153,8 @@ export class GoogleMap extends Component {
     );
   }
 
-  enableDirections() {
-    this._directionsService = new google.maps.DirectionsService();
-    this._directionsDisplay = new google.maps.DirectionsRenderer();
-    this._directionsDisplay.setMap(this._map);
-    this.renderDirections();
-  }
-
-  disableDirections() {
-    if (this._directionsDisplay) {
-      this._directionsDisplay.setMap(null);
-      this._directionsDisplay = null;
-      this._directionsService = null;
-    }
+  hideDirections() {
+    this._directionsDisplay.setMap(null);
   }
 
   initializeMap() {
@@ -175,38 +164,38 @@ export class GoogleMap extends Component {
 
     // show traffic layer if props say so
     if (showTraffic) {
-      this.enableTrafficLayer();
+      this.showTraffic();
     }
 
     if (showDirections) {
-      this.enableDirections();
+      this.showDirections();
     }
     else {
-      this.enableMarkers();
+      this.showMarkers();
     }
 
     this.props.subscribePanTo(this.panTo);
   }
 
-  updateMap(nextProps) {
-    const { showDirections, showTraffic } = nextProps;
+  updateMap() {
+    const { showDirections, showTraffic } = this.props;
 
     this._map.setOptions(this.mapOptions());
 
     if (showTraffic) {
-      this.enableTrafficLayer();
+      this.showTraffic();
     }
     else {
-      this.disableTrafficLayer();
+      this.hideTraffic();
     }
 
     if (showDirections) {
-      this.disableMarkers();
-      this.enableDirections();
+      this.hideMarkers();
+      this.showDirections();
     }
     else {
-      this.disableDirections();
-      this.enableMarkers();
+      this.hideDirections();
+      this.showMarkers();
     }
   }
 
@@ -218,8 +207,8 @@ export class GoogleMap extends Component {
     this.initializeMap();
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.updateMap(nextProps);
+  componentDidUpdate(prevProps, prevState) {
+    this.updateMap();
   }
 
   componentWillUnmount() {
