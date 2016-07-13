@@ -10,8 +10,17 @@ const initialState = fromJS({
   },
   markers:  [
     {
+      label:  'W',
+      id:     '0035',
+      position: {
+        lat:  30.2705682,
+        lng:  -97.7532994
+      },
+      title:  'Whole Foods Market'
+    },
+    {
       label:  'D',
-      id:     '0001',
+      id:     '0010',
       position: {
         lat:  30.2644987,
         lng:  -97.7821164
@@ -19,8 +28,17 @@ const initialState = fromJS({
       title:  'Dropoff'
     },
     {
+      label:  'A',
+      id:     '0015',
+      position: {
+        lat:  30.255541,
+        lng:  -97.7655079
+      },
+      title:  'Alamo Drafthouse South Lamar'
+    },
+    {
       label:  'E',
-      id:     '0002',
+      id:     '0020',
       position: {
         lat:  30.2659184,
         lng:  -97.7356529
@@ -28,13 +46,58 @@ const initialState = fromJS({
       title:  'Easy Tiger'
     },
     {
-      label:  'P',
-      id:     '0003',
+      label:  'F',
+      id:     '0025',
       position: {
-        lat:  30.2499844,
-        lng:  -97.7522357
+        lat:  30.2613287,
+        lng:  -97.7184552
       },
-      title:  'Perla\'s'
+      title:  'Flyrite Chicken Sandwiches'
+    },
+    {
+      label:  'W',
+      id:     '0030',
+      position: {
+        lat:  30.2380491,
+        lng:  -97.739416
+      },
+      title:  'Whip In'
+    },
+    {
+      label:  'P',
+      id:     '0040',
+      position: {
+        lat:  30.2453753,
+        lng:  -97.759618
+      },
+      title:  'Polvos'
+    },
+    {
+      label:  'B',
+      id:     '0045',
+      position: {
+        lat:  30.241757,
+        lng:  -97.727171
+      },
+      title:  'Buzzmill'
+    },
+    {
+      label:  'R',
+      id:     '0050',
+      position: {
+        lat:  30.268691,
+        lng:  -97.749149
+      },
+      title:  'Ranch 616'
+    },
+    {
+      label:  'L',
+      id:     '0060',
+      position: {
+        lat:  30.2529945,
+        lng:  -97.7107592
+      },
+      title:  'Lustre Pearl'
     }
   ],
   showDirections: false,
