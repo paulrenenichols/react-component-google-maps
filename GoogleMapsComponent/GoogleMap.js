@@ -67,7 +67,6 @@ export class GoogleMap extends Component {
   };
 
   _directionsService    = null;
-  _directionsDisplay    = null;
   _map                  = null;
   _trafficLayer         = null;
   _mapMarkers           = {};
@@ -81,7 +80,6 @@ export class GoogleMap extends Component {
     }
 
     this._directionsService = new google.maps.DirectionsService();
-    this._directionsDisplay = new google.maps.DirectionsRenderer();
     this._trafficLayer      = new google.maps.TrafficLayer();
   }
 
