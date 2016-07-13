@@ -66,11 +66,12 @@ export class GoogleMap extends Component {
     showTraffic: false
   };
 
-  _directionsService  = null;
-  _directionsDisplay  = null;
-  _map                = null;
-  _trafficLayer       = null;
-  _mapMarkers         = {};
+  _directionsService    = null;
+  _directionsDisplay    = null;
+  _map                  = null;
+  _trafficLayer         = null;
+  _mapMarkers           = {};
+  _directionsData       = [];
 
   constructor(props) {
     super(props);
@@ -81,7 +82,7 @@ export class GoogleMap extends Component {
 
     this._directionsService = new google.maps.DirectionsService();
     this._directionsDisplay = new google.maps.DirectionsRenderer();
-    this._trafficLayer = new google.maps.TrafficLayer();
+    this._trafficLayer      = new google.maps.TrafficLayer();
   }
 
   mapOptions() {
@@ -112,15 +113,12 @@ export class GoogleMap extends Component {
   }
 
   hideMarkers() {
-    if (this._mapMarkers) {
-      const markerKeys = Object.keys(this._mapMarkers);
-      const mapMarkers = this._mapMarkers;
-      markerKeys.forEach(function (markerKey) {
-        mapMarkers[markerKey].setMap(null);
-        delete mapMarkers[markerKey];
-      });
-      this._mapMarkers = null;
-    }
+    const markerKeys = Object.keys(this._mapMarkers);
+    const mapMarkers = this._mapMarkers;
+    markerKeys.forEach(function (markerKey) {
+      mapMarkers[markerKey].setMap(null);
+      delete mapMarkers[markerKey];
+    });
   }
 
   showTraffic() {
@@ -131,10 +129,15 @@ export class GoogleMap extends Component {
     this._trafficLayer.setMap(null);
   }
 
+  _setDirectionsData = (directionsPolylines) => {
+    this._directionsData =       directionsPolylines;
+  }
+
   showDirections() {
     const { origin, destination, waypoints } = this.props.directionsMarkers;
-    const directionsDisplay = this._directionsDisplay;
-    this._directionsDisplay.setMap(this._map);
+    const _setDirectionsData = this._setDirectionsData;
+    const map = this._map;
+
     this._directionsService.route({
         origin: origin.position,
         destination: destination.position,
@@ -147,20 +150,71 @@ export class GoogleMap extends Component {
       },
       function (result, status) {
         if (status == google.maps.DirectionsStatus.OK) {
-          directionsDisplay.setDirections(result);
+          var directionsData = result.routes[0].legs.map(function (leg) {
+            var polyline = new google.maps.Polyline({
+              path: [],
+              strokeColor: 'blue',
+              strokeWeight: 10,
+              strokeOpacity: 0.5
+            });
+            var infoWindow = new google.maps.InfoWindow({
+              content: `${leg.distance.text}<br/>${leg.duration.text}`
+            });
+            polyline.addListener('mouseover',
+                function directionsRouteMouseoverEventHandler(e) {
+                  this.setOptions({
+                    strokeColor: 'red',
+                    strokeOpacity: 0.5,
+                    strokeWeight: 10
+                  });
+                  infoWindow.setPosition(e.latLng);
+                  infoWindow.open(map);
+                }
+            );
+            polyline.addListener('mouseout',
+                function directionsRouteMouseoutEventHandler() {
+                  this.setOptions({
+                    strokeColor: 'blue',
+                    strokeWeight: 10,
+                    strokeOpacity: 0.5
+                  });
+                  infoWindow.close();
+                }
+            );
+            const steps = leg.steps;
+            steps.forEach(function (step) {
+              step.path.forEach(function (latLng) {
+                polyline.getPath().push(latLng);
+              });
+            });
+            return {
+              infoWindow,
+              polyline
+            };
+          });
+          directionsData.forEach(function (leg) {
+            leg.polyline.setMap(map);
+          });
+          _setDirectionsData(directionsData);
         }
       }
     );
   }
 
   hideDirections() {
-    this._directionsDisplay.setMap(null);
+    this._directionsData.forEach(function (leg) {
+      leg.polyline.setMap(null);
+      google.maps.event.clearInstanceListeners(leg);
+      leg.infoWindow.close();
+    });
+    this._directionsData = [];
   }
 
   initializeMap() {
     const { showDirections, showTraffic } = this.props;
     // create a new google map
     this._map = new google.maps.Map(ReactDOM.findDOMNode(this), this.mapOptions());
+    this.showMarkers();
 
     // show traffic layer if props say so
     if (showTraffic) {
@@ -170,9 +224,6 @@ export class GoogleMap extends Component {
     if (showDirections) {
       this.showDirections();
     }
-    else {
-      this.showMarkers();
-    }
 
     this.props.subscribePanTo(this.panTo);
   }
@@ -181,6 +232,7 @@ export class GoogleMap extends Component {
     const { showDirections, showTraffic } = this.props;
 
     this._map.setOptions(this.mapOptions());
+    this.showMarkers();
 
     if (showTraffic) {
       this.showTraffic();
@@ -190,12 +242,10 @@ export class GoogleMap extends Component {
     }
 
     if (showDirections) {
-      this.hideMarkers();
       this.showDirections();
     }
     else {
       this.hideDirections();
-      this.showMarkers();
     }
   }
 
