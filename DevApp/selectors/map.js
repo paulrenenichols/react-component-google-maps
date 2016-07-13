@@ -24,10 +24,15 @@ export const zoom               = createImmutableSelector(
 export const directionsMarkers  = createImmutableSelector(
   markers,
   markers => {
+    const origin        = markers[0];
+    const destination   = markers[markers.length - 1];
+    const waypoints     = markers.filter(function (element, index, array) {
+      return (index !== 0) && (index !== array.length - 1);
+    });
     return {
-      origin:       markers[0],
-      destination:  markers[markers.length - 1],
-      waypoints:    [markers[1]]
+      origin,
+      destination,
+      waypoints
     };
   }
 );
