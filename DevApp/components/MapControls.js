@@ -7,7 +7,7 @@ const  { Marker }             = GoogleMapsComponent;
 
 export class MapControls extends Component {
   static propTypes = {
-    markers:                      PropTypes.arrayOf(PropTypes.oneOfType([
+    controlsMarkers:                      PropTypes.arrayOf(PropTypes.oneOfType([
       PropTypes.object,
       PropTypes.instanceOf(Marker)
     ])),
@@ -18,7 +18,7 @@ export class MapControls extends Component {
   };
 
   static defaultProps = {
-    markers:                      [],
+    controlsMarkers:                      [],
     panMap:                       () => {},
     showDirections:               false,
     setDirectionsDisplayState:    () => {},
@@ -30,12 +30,14 @@ export class MapControls extends Component {
   }
 
   render() {
-    const { markers,
+    const { controlsMarkers,
             panMap,
             showDirections,
             showTraffic,
             setDirectionsDisplayState,
             setTrafficDisplayState } = this.props;
+
+    console.log(controlsMarkers);
 
     return (
       <div className={'mapControlsContainer'}>
@@ -52,7 +54,7 @@ export class MapControls extends Component {
           </div>
           <div className={'markerList'}>
             <h3>Markers</h3>
-            {markers.map((marker) => {
+            {controlsMarkers.map((marker) => {
               return <button type={'button'}
                              key={marker.id}
                              onClick={() => panMap(marker.position)}>{marker.title}</button>;
