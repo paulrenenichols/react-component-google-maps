@@ -7,9 +7,17 @@ export const center             = createImmutableSelector(
   map => map.get('center').toJS()
 );
 
+export const catbugMarker       = state => map(state).get('catbugMarker');
+
 export const markers            = createImmutableSelector(
   map,
-  map => map.get('markers').toJS()
+  map => map.get('markers')
+);
+
+export const controlsMarkers    = createImmutableSelector(
+  markers,
+  catbugMarker,
+  (markers, catbugMarker) => markers.push(catbugMarker)
 );
 
 export const showDirections     = state => map(state).get('showDirections');
@@ -24,9 +32,10 @@ export const zoom               = createImmutableSelector(
 export const directionsMarkers  = createImmutableSelector(
   markers,
   markers => {
-    const origin        = markers[0];
-    const destination   = markers[markers.length - 1];
-    const waypoints     = markers.filter(function (element, index, array) {
+    const markersJS     = markers.toJS();
+    const origin        = markersJS[0];
+    const destination   = markersJS[markersJS.length - 1];
+    const waypoints     = markersJS.filter(function (element, index, array) {
       return (index !== 0) && (index !== array.length - 1);
     });
     return {
@@ -40,6 +49,8 @@ export const directionsMarkers  = createImmutableSelector(
 export default {
   map,
   center,
+  catbugMarker,
+  controlsMarkers,
   directionsMarkers,
   markers,
   zoom,

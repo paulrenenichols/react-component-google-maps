@@ -107,6 +107,10 @@ export class GoogleMap extends Component {
         title:    marker.title,
       });
 
+      if (marker.icon) {
+        reduction[marker.id].setIcon(marker.icon);
+      }
+
       return reduction;
     }, {});
   }

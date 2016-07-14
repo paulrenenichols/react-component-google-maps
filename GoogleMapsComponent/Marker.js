@@ -1,16 +1,26 @@
 export class Marker {
   // get the marker icon
-  get icon()      {}
+  get icon()      {
+    return null;
+  }
 
   // get the id of the Marker
   // must be unique for panning, animation
-  get id()        {}
+  get id()        {
+    return null;
+  }
 
-  get label()     {}
+  get label()     {
+    return null;
+  }
 
   // get the position of the marker
-  get position()  {}
+  get position()  {
+    return null;
+  }
 
   // get the title of the marker
-  get title()     {}
+  get title()     {
+    return null;
+  }
 }
