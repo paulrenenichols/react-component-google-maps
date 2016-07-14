@@ -37,8 +37,6 @@ export class MapControls extends Component {
             setDirectionsDisplayState,
             setTrafficDisplayState } = this.props;
 
-    console.log(controlsMarkers);
-
     return (
       <div className={'mapControlsContainer'}>
         <div className={'mapControlsContents'}>

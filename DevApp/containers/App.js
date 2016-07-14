@@ -9,7 +9,6 @@ import { MapControls }                              from '../components/MapContr
 
 import selectors                                    from '../selectors/index';
 const  { center,
-         markers,
          controlsMarkers,
          zoom,
          directionsMarkers,
