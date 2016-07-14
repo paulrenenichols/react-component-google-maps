@@ -97,6 +97,7 @@ export class GoogleMap extends Component {
   }
 
   showMarkers() {
+    this.clearMarkers();
     const map = this._map;
     this._mapMarkers = this.props.markers.reduce(function (reduction, marker) {
       reduction[marker.id] = new google.maps.Marker({
@@ -110,7 +111,7 @@ export class GoogleMap extends Component {
     }, {});
   }
 
-  hideMarkers() {
+  clearMarkers() {
     const markerKeys = Object.keys(this._mapMarkers);
     const mapMarkers = this._mapMarkers;
     markerKeys.forEach(function (markerKey) {
@@ -226,23 +227,23 @@ export class GoogleMap extends Component {
     this.props.subscribePanTo(this.panTo);
   }
 
-  updateMap() {
+  updateMap(prevProps) {
     const { showDirections, showTraffic } = this.props;
 
     this._map.setOptions(this.mapOptions());
     this.showMarkers();
 
-    if (showTraffic) {
+    if (showTraffic && !prevProps.showTraffic) {
       this.showTraffic();
     }
-    else {
+    else if (!showTraffic && prevProps.showTraffic) {
       this.hideTraffic();
     }
 
-    if (showDirections) {
+    if (showDirections && !prevProps.showDirections) {
       this.showDirections();
     }
-    else {
+    else if (!showDirections && prevProps.showDirections) {
       this.hideDirections();
     }
   }
@@ -256,7 +257,7 @@ export class GoogleMap extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    this.updateMap();
+    this.updateMap(prevProps);
   }
 
   componentWillUnmount() {
