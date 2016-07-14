@@ -10,6 +10,7 @@ import { MapControls }                              from '../components/MapContr
 import selectors                                    from '../selectors/index';
 const  { center,
          markers,
+         controlsMarkers,
          zoom,
          directionsMarkers,
          showDirections,
@@ -23,7 +24,8 @@ const  Creators                                     = Actions.Map.Creators;
 function mapStateToProps(state) {
   return {
     center:             center(state),
-    markers:            markers(state),
+    markers:            controlsMarkers(state).toJS(),
+    controlsMarkers:    controlsMarkers(state).toJS(),
     zoom:               zoom(state),
     directionsMarkers:  directionsMarkers(state),
     showDirections:     showDirections(state),

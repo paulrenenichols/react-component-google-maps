@@ -3,10 +3,21 @@ import { fromJS }   from 'immutable';
 import Actions      from '../actions/index';
 const  Types        = Actions.Map.Types;
 
+import catbug       from '../images/cat-bug-icon.png';
+
 const initialState = fromJS({
   center: {
     lat:    30.2746652,
     lng:    -97.7403505
+  },
+  catbugMarker: {
+    id: 'catbug',
+    position: {
+      lat:    30.2746652,
+      lng:    -97.7403505
+    },
+    title: 'catbug',
+    icon: catbug
   },
   markers:  [
     {
