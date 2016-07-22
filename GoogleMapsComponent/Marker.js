@@ -23,4 +23,6 @@ export class Marker {
   get title()     {
     return null;
   }
+
+  onClick() {}
 }
