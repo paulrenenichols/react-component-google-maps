@@ -13,6 +13,7 @@ export class GoogleMap extends Component {
       lat: PropTypes.number,
       lng: PropTypes.number
     }),
+    centerChanged:        PropTypes.func,
     containerStyle:       PropTypes.object,
     directionMarkers:     PropTypes.shape({
       origin:       PropTypes.oneOfType([
@@ -36,11 +37,13 @@ export class GoogleMap extends Component {
     subscribePanTo:       PropTypes.func,
     unsubscribePanTo:     PropTypes.func,
     zoom:                 PropTypes.number,
+    zoomChanged:          PropTypes.func,
     showDirections:       PropTypes.bool,
     showTraffic:          PropTypes.bool
   };
 
   static defaultProps = {
+    centerChanged:         () => {},
     containerStyle: {
       width:  '100%',
       height: '100%'
@@ -63,7 +66,8 @@ export class GoogleMap extends Component {
     subscribePanTo: () => {},
     unsubscribePanTo: () => {},
     showDirections:   false,
-    showTraffic: false
+    showTraffic: false,
+    zoomChanged: () => {}
   };
 
   _directionsService    = null;
@@ -100,15 +104,22 @@ export class GoogleMap extends Component {
     this.clearMarkers();
     const map = this._map;
     this._mapMarkers = this.props.markers.reduce(function (reduction, marker) {
-      reduction[marker.id] = new google.maps.Marker({
-        label:    marker.label,
-        map:      map,
-        position: marker.position,
-        title:    marker.title,
-      });
+      if (Number.isFinite(marker.position.lat) && Number.isFinite(marker.position.lng)) {
+        reduction[marker.id] = new google.maps.Marker({
+          label:      marker.label,
+          map:        map,
+          position:   marker.position,
+          title:      marker.title,
+          animation:  google.maps.Animation.DROP
+        });
 
-      if (marker.icon) {
-        reduction[marker.id].setIcon(marker.icon);
+        if (marker.icon) {
+          reduction[marker.id].setIcon(marker.icon);
+        }
+
+        if (marker.click && (typeof marker.click === 'function')) {
+          reduction[marker.id].addListener('click', marker.onClick);
+        }
       }
 
       return reduction;
@@ -120,6 +131,7 @@ export class GoogleMap extends Component {
     const mapMarkers = this._mapMarkers;
     markerKeys.forEach(function (markerKey) {
       mapMarkers[markerKey].setMap(null);
+      google.maps.event.clearInstanceListeners(mapMarkers[markerKey]);
       delete mapMarkers[markerKey];
     });
   }
@@ -214,9 +226,18 @@ export class GoogleMap extends Component {
   }
 
   initializeMap() {
-    const { showDirections, showTraffic } = this.props;
+    const { showDirections, showTraffic, centerChanged, zoomChanged } = this.props;
     // create a new google map
     this._map = new google.maps.Map(ReactDOM.findDOMNode(this), this.mapOptions());
+
+    const map = this._map;
+
+    this._map.addListener('center_changed', () => {
+      const center = map.getCenter();
+      centerChanged({ lat: center.lat(), lng: center.lng() });
+    });
+    this._map.addListener('zoom_changed', () => { zoomChanged(map.getZoom()); });
+
     this.showMarkers();
 
     // show traffic layer if props say so
@@ -253,7 +274,9 @@ export class GoogleMap extends Component {
   }
 
   panTo = (msg, latLng) => {
-    this._map.panTo(latLng);
+    if (Number.isFinite(latLng.lat) && Number.isFinite(latLng.lng)) {
+      this._map.panTo(latLng);
+    }
   }
 
   componentDidMount() {
